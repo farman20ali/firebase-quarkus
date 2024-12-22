@@ -46,10 +46,10 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-openapi</artifactId>
         </dependency>
-        <dependency>
+        <dependency>    
             <groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
-            <version>9.4.2</version>
+            <version>9.4.1</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
