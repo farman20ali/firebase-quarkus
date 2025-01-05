@@ -3,7 +3,7 @@ package org.firebase.service;
 import java.util.List; 
 import org.firebase.dto.NotificationRequest;
 
-import com.google.api.core.ApiFuture;
+import com.google.api.core.ApiFuture; 
 import com.google.firebase.messaging.*;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -34,6 +34,19 @@ public class NotificationService {
         return firebaseMessaging.sendAsync(message);
     }
 
+    /**
+     * Send notification to a specific user.
+     */
+    public ApiFuture<String> sendToTokenDataOnly(String token, NotificationRequest request) {
+        Message message = Message.builder()
+                .setToken(token)
+                .putData("title", request.getTitle())
+                .putData("body", request.getBody())
+                .build();
+
+        return firebaseMessaging.sendAsync(message);
+    }
+
     
     /**
      * Send notification to a specific user's devices.
@@ -41,6 +54,15 @@ public class NotificationService {
     public void sendToUser(List<String> tokens,NotificationRequest notificationRequest) {
         tokens.forEach(token ->{ try{sendToToken(token, notificationRequest).get();}catch(Exception e){System.out.println(e);};});
     }
+
+    
+    /**
+     * Send notification to a specific user's devices.
+     */
+    public void sendToUserDataOnly(List<String> tokens,NotificationRequest notificationRequest) {
+        tokens.forEach(token ->{ try{sendToTokenDataOnly(token, notificationRequest).get();}catch(Exception e){System.out.println(e);};});
+    }
+
     /**
      * Send notification to all users via topic subscription.
      */
@@ -58,6 +80,20 @@ public class NotificationService {
         return firebaseMessaging.sendAsync(message);
     }
  
+      /**
+     * Send notification to all users via topic subscription.
+     */
+    public ApiFuture<String> sendToAllUsersDataOnly(String topic,NotificationRequest request) {
+        Message message = Message.builder()
+                .setTopic(topic)
+                .putData("title", request.getTitle())
+                .putData("body", request.getBody())
+                .build();
+
+        return firebaseMessaging.sendAsync(message);
+    }
+ 
+
  /**
      * Subscribes a list of tokens to a specific topic.
      *
@@ -98,4 +134,84 @@ public class NotificationService {
             throw new RuntimeException("Failed to unsubscribe from topic: " + e.getMessage(), e);
         }
     }
+
+            /**
+         * Send notification with deep link to a specific user.
+         */
+        public ApiFuture<String> notifyUserTokenWithDeepLink(String token, NotificationRequest request, String deepLink) {
+            Message message = Message.builder()
+                    .setToken(token)
+                    .setNotification(
+                            Notification.builder()
+                                    .setTitle(request.getTitle())
+                                    .setBody(request.getBody())
+                                    .build()
+                    )
+                    .putData("deep_link", deepLink) // Add custom deep link data
+                    .build();
+
+            return firebaseMessaging.sendAsync(message);
+        }
+
+                /**
+         * Send notification to a specific user's devices.
+         */
+        public void sendDeepLinkToToken(List<String> tokens,NotificationRequest notificationRequest,String deepLink) {
+            tokens.forEach(token ->{ try{notifyUserTokenWithDeepLink(token, notificationRequest, deepLink)
+                .addListener(() -> System.out.println("Notification sent with deep link"), Runnable::run);}catch(Exception e){System.out.println(e);};});
+        }
+
+        public ApiFuture<String> notifyUserTokenWithDeepLinkDataOnly(String token, NotificationRequest request, String deepLink) {
+            Message message = Message.builder()
+                    .setToken(token)
+                    .putData("title", request.getTitle())
+                    .putData("body", request.getBody())
+                    .putData("deep_link", deepLink) // Add custom deep link data
+                    .build();
+
+            return firebaseMessaging.sendAsync(message);
+        }
+
+                /**
+         * Send notification to a specific user's devices.
+         */
+        public void sendDeepLinkToTokenDataOnly(List<String> tokens,NotificationRequest notificationRequest,String deepLink) {
+            tokens.forEach(token ->{ try{notifyUserTokenWithDeepLinkDataOnly(token, notificationRequest, deepLink)
+                .addListener(() -> System.out.println("Notification sent with deep link"), Runnable::run);}catch(Exception e){System.out.println(e);};});
+        }
+
+
+        /**
+         * Send notification with deep link to all users via topic subscription.
+         */
+        public ApiFuture<String> sendDeepLinkToTopic(String topic, NotificationRequest request, String deepLink) {
+            Message message = Message.builder()
+                    .setTopic(topic)
+                    .setNotification(
+                            Notification.builder()
+                                    .setTitle(request.getTitle())
+                                    .setBody(request.getBody())
+                                    .build()
+                    )
+                    .putData("deep_link", deepLink) // Add custom deep link data
+                    .build();
+
+            return firebaseMessaging.sendAsync(message);
+        }
+
+         /**
+         * Send notification with deep link to all users via topic subscription.
+         */
+        public ApiFuture<String> sendDeepLinkToTopicDataOnly(String topic, NotificationRequest request, String deepLink) {
+            Message message = Message.builder()
+                    .setTopic(topic)
+                    .putData("title", request.getTitle())
+                    .putData("body", request.getBody())
+                    .putData("deep_link", deepLink) // Add custom deep link data
+                    .build();
+
+            return firebaseMessaging.sendAsync(message);
+        }
+
+
 }

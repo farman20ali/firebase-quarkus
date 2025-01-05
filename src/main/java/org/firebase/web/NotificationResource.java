@@ -43,7 +43,9 @@ public class NotificationResource {
     @Path("/send-to-all")
     public Response sendToAllUsers(NotificationRequest notificationRequest) {
         try {
-            notificationService.sendToAllUsers("all-users",notificationRequest);
+            String topic =notificationRequest.getTopic()!=null?notificationRequest.getTopic(): "all-users";
+            
+            notificationService.sendToAllUsers(topic,notificationRequest);
             return Response.ok("Notification sent to all users").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getCause().getMessage()).build();
@@ -51,11 +53,99 @@ public class NotificationResource {
     }
 
     @POST
+    @Path("/send-to-all-data")
+    public Response sendToAllUsersDataOnly(NotificationRequest notificationRequest) {
+        try {
+            String topic =notificationRequest.getTopic()!=null?notificationRequest.getTopic(): "all-users";
+            
+            notificationService.sendToAllUsersDataOnly(topic,notificationRequest);
+            return Response.ok("Notification sent to all users").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getCause().getMessage()).build();
+        }
+    }
+
+
+    @POST
+    @Path("/send-to-all-dl")
+    public Response sendToAllUsersWithDeepLink(NotificationRequest notificationRequest) {
+        try {
+            String topic =notificationRequest.getTopic()!=null?notificationRequest.getTopic(): "all-users";
+            String deepLink =notificationRequest.getDeepLink()!=null?notificationRequest.getDeepLink(): "myapp://notifications";
+        
+            notificationService.sendDeepLinkToTopic(topic, notificationRequest, deepLink)
+            .addListener(() -> System.out.println("Topic notification sent with deep link"), Runnable::run);
+
+            return Response.ok("Notification sent to all users").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getCause().getMessage()).build();
+        }
+    }
+
+    
+    @POST
+    @Path("/send-to-all-dl-data")
+    public Response sendToAllUsersWithDeepLinkDataOnly(NotificationRequest notificationRequest) {
+        try {
+            String topic =notificationRequest.getTopic()!=null?notificationRequest.getTopic(): "all-users";
+            String deepLink =notificationRequest.getDeepLink()!=null?notificationRequest.getDeepLink(): "myapp://notifications";
+        
+            notificationService.sendDeepLinkToTopicDataOnly(topic, notificationRequest, deepLink)
+            .addListener(() -> System.out.println("Topic notification sent with deep link"), Runnable::run);
+
+            return Response.ok("Notification sent to all users").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getCause().getMessage()).build();
+        }
+    }
+
+
+    @POST
     @Path("/send-to-user")
     public Response sendToUser(NotificationRequest notificationRequest) {
         try {
             List<String> tokens =Collections.singletonList(notificationRequest.getToken());
             notificationService.sendToUser(tokens, notificationRequest);
+            return Response.ok("Notification sent to user " + notificationRequest.getUserId()).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getCause().getMessage()).build();
+        }
+    }
+
+    @POST
+    @Path("/send-to-user-data")
+    public Response sendToUserDataOnly(NotificationRequest notificationRequest) {
+        try {
+            List<String> tokens =Collections.singletonList(notificationRequest.getToken());
+            notificationService.sendToUserDataOnly(tokens, notificationRequest);
+            return Response.ok("Notification sent to user " + notificationRequest.getUserId()).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getCause().getMessage()).build();
+        }
+    }
+
+
+
+    @POST
+    @Path("/send-to-user-dl")
+    public Response sendToUserWithDeepLink(NotificationRequest notificationRequest) {
+        try {
+            List<String> tokens =Collections.singletonList(notificationRequest.getToken());
+            String deepLink =notificationRequest.getDeepLink()!=null?notificationRequest.getDeepLink(): "myapp://notifications";
+            notificationService.sendDeepLinkToToken(tokens, notificationRequest,deepLink);
+            return Response.ok("Notification sent to user " + notificationRequest.getUserId()).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getCause().getMessage()).build();
+        }
+    }
+
+    @POST
+    @Path("/send-to-user-dl-data")
+    public Response sendToUserWithDeepLinkData(NotificationRequest notificationRequest) {
+        try {
+            List<String> tokens =Collections.singletonList(notificationRequest.getToken());
+            String deepLink =notificationRequest.getDeepLink()!=null?notificationRequest.getDeepLink(): "myapp://notifications";
+            notificationService.sendDeepLinkToToken(tokens, notificationRequest,deepLink);
             return Response.ok("Notification sent to user " + notificationRequest.getUserId()).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getCause().getMessage()).build();

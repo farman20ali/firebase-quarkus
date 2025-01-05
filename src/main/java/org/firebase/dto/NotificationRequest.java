@@ -9,6 +9,7 @@ public class NotificationRequest {
     private String userId;
     private List<String> tokenList;
     private String topic;
+    private String deepLink;
     public String getTitle() {
         return title;
     }
@@ -49,5 +50,11 @@ public class NotificationRequest {
     }
     public void setTopic(String topic) {
         this.topic = topic;
+    }
+    public String getDeepLink() {
+        return deepLink;
+    }
+    public void setDeepLink(String deepLink) {
+        this.deepLink = deepLink;
     }
 }
